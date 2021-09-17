@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-from scraping.scrape_fx_data import scrape
-import sys
+from trading_rule.only_macd_signal import trade
 
 def main():
-    start = sys.argv[1]
-    end = sys.argv[2]
 
     try:
-        scrape(start=start,end=end)
+        trade()
         print('done')
     except BaseException as e:
         print(e)
