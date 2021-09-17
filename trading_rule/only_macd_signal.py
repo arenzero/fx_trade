@@ -57,19 +57,18 @@ def out_cross_flag(macd,macd_signal):
         be_flag = af_flag
     return pd.Series(cross_list,index=macd.index)
 
-def trade(current_day = '2021-06-07',posses = {'JPY':10000,'USD':0},jpy_usd = pd.read_csv('../temp_data/jpy_usd.csv')):
+def trade(current_day = '2021-06-07',posses = {'JPY':10000,'USD':0},df = pd.read_csv('C:/Users/masay/Documents/Python Scripts/FX_trade/fx_trade/temp_data/jpy_usd.csv')):
     
-
     #データの前処理
-    jpy_usd.index = pd.to_datetime(jpy_usd['Date'])
-    del jpy_usd['Date']
-    jpy_usd = jpy_usd[:current_day]
+    df.index = pd.to_datetime(df['Date'])
+    del df['Date']
+    df = df[:current_day]
 
     #MACDの計算
-    macd,macd_signal = calc_macd(jpy_usd['Close'],short_term=6,long_term=14,signal_term=6)
-    jpy_usd['macd_flag'] = out_cross_flag(macd,macd_signal)
+    macd,macd_signal = calc_macd(df['Close'],short_term=6,long_term=14,signal_term=6)
+    df['macd_flag'] = out_cross_flag(macd,macd_signal)
 
-    today = jpy_usd.iloc[-1,:]
+    today = df.iloc[-1,:]
 
     #trading rule
     if today['macd_flag'] == 'gold':
@@ -77,7 +76,7 @@ def trade(current_day = '2021-06-07',posses = {'JPY':10000,'USD':0},jpy_usd = pd
     elif today['macd_flag'] == 'dead':
         posses['JPY'] += posses['USD']*today['Close']
     
-    print(posses)
+    return posses
 
 if __name__ == "__main__":
     trade()
