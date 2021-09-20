@@ -3,7 +3,7 @@ import pandas_datareader.data as pdr
 import yfinance as yfin
 from utils.config_read import read_config
 
-config = read_config
+config = read_config()
 
 def scrape(start = '2021-06-07',end = '2021-09-13'):
     yfin.pdr_override()
