@@ -8,6 +8,11 @@ import sys
 sys.path.append('C:/Users/masay/Documents/Python Scripts/FX_trade/fx_trade')
 from utils.macd import calc_macd,out_cross_flag
 
+"""
+半年検証後、良ければ再学習して予測
+"""
+
+
 def trade(current_day = '2021-06-14',posses = {'JPY':10000,'USD':0},df = pd.read_csv('C:/Users/masay/Documents/Python Scripts/FX_trade/fx_trade/temp_data/jpy_usd.csv')):
 
     df_c = df.copy()
@@ -81,16 +86,21 @@ def trade(current_day = '2021-06-14',posses = {'JPY':10000,'USD':0},df = pd.read
     acc = accuracy_score(t.dropna(),y[:-1].dropna())
 
     flag = 0
-    #直近半年の精度が80％以上なら取引する
-    if acc>0.8:
-        #今日の引値より明日の予想引値が高いなら買い、逆なら売り
-        if test['Close'][-2] < pred[-1]:
-            posses['USD'] += (posses['JPY']*0.5/test['Close'][-2])
+    print('accuracy:',acc)
+    #直近半年の精度が80％以上なら再学習して予測に応じて取引
+    if acc>0.7:
+        train = df_c.iloc[-about_three_years:-1,:]
+        pred_data = df_c.iloc[-1,:]
+        reg.fit(train.drop('Close',axis=1),train['Close'])
+        pred = reg.predict(pd.DataFrame(pred_data).T.drop('Close',axis=1))
+        #今日の引値より明日の予想引値が高いなら買い、逆なら売り（翌日のOpenからCloseで取引）
+        if df_c['Close'][-2] < pred[0]:
+            posses['USD'] += (posses['JPY']*0.5/df_c['Close'][-2])
             posses['JPY'] = posses['JPY']*0.5
             flag = 'after_sell'
 
-        elif test['Close'][-2] > pred[-1]:
-            posses['JPY'] += (posses['USD']*0.5*test['Close'][-2])
+        elif df_c['Close'][-2] > pred[0]:
+            posses['JPY'] += (posses['USD']*0.5*df_c['Close'][-2])
             posses['USD'] = posses['USD']*0.5
             flag = 'after_buy'
 
