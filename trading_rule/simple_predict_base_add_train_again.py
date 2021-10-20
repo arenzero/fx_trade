@@ -95,12 +95,12 @@ def trade(current_day = '2021-06-14',posses = {'JPY':10000,'USD':0},df = pd.read
         pred = reg.predict(pd.DataFrame(pred_data).T.drop('Close',axis=1))
         #今日の引値より明日の予想引値が高いなら買い、逆なら売り（翌日のOpenからCloseで取引）
         if df_c['Close'][-2] < pred[0]:
-            posses['USD'] += (posses['JPY']*0.5/df_c['Close'][-2])
+            posses['USD'] += (posses['JPY']*0.5/df_c['Close'][-2]*0.9999)
             posses['JPY'] = posses['JPY']*0.5
             flag = 'after_sell'
 
         elif df_c['Close'][-2] > pred[0]:
-            posses['JPY'] += (posses['USD']*0.5*df_c['Close'][-2])
+            posses['JPY'] += (posses['USD']*0.5*df_c['Close'][-2]*0.9999)
             posses['USD'] = posses['USD']*0.5
             flag = 'after_buy'
 
